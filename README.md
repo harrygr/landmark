@@ -2,6 +2,8 @@
 
 A geospatial analysis library for Elixir.
 
+Landmark is designed to work with structs provided by the [Geo][geo] library
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
@@ -15,6 +17,4 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/landmark>.
+[geo]: https://github.com/felt/geo

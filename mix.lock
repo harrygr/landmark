@@ -1,0 +1,4 @@
+%{
+  "geo": {:hex, :geo, "4.0.1", "f4ae3fd912b0536bfe9ec3bce15eb554197ab0739c01297c8534c20dcedd561c", [:mix], [{:jason, "~> 1.4", [hex: :jason, repo: "hexpm", optional: true]}], "hexpm", "32eb624feff75d043bbdd43f67e3869c5fc729e221333271b07cdc98ba98563d"},
+  "math": {:hex, :math, "0.6.0", "69325af99e600123f6d994833502f6d063a2fa8f2786a3c0461fe6c6123a5166", [:mix], [], "hexpm", "2c73a64d64f719ee1f2821d382f3ed63e8e9564e5176d1c8aa777aac49b41bf7"},
+}
