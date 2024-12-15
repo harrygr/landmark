@@ -24,7 +24,8 @@ defmodule Landmark.MixProject do
   defp deps do
     [
       {:geo, "~> 3.1 or ~> 4.0"},
-      {:math, "~> 0.6.0"}
+      {:math, "~> 0.6.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
