@@ -34,4 +34,46 @@ defmodule MeasurementTest do
       assert_in_delta distance, 0.0152, 0.0001
     end
   end
+
+  describe "centroid" do
+    test "getting the centroid of a point" do
+      point = %Geo.Point{
+        coordinates: {2, 3}
+      }
+
+      assert Measurement.centroid(point) == %Geo.Point{coordinates: {2, 3}}
+    end
+
+    test "getting the centroid of a polygon" do
+      polygon = %Geo.Polygon{
+        coordinates: [[{2, 2}, {2, 4}, {6, 4}, {6, 2}, {2, 2}]]
+      }
+
+      assert Measurement.centroid(polygon) == %Geo.Point{coordinates: {4, 3}}
+    end
+
+    test "getting the centroid of a polygon with a hole" do
+      polygon = %Geo.Polygon{
+        coordinates: [
+          [{2, 2}, {2, 4}, {6, 4}, {6, 2}, {2, 2}],
+          [{3, 3}, {3, 3.5}, {3.5, 4}, {4, 3}, {3, 3}]
+        ]
+      }
+
+      assert Measurement.centroid(polygon) == %Geo.Point{coordinates: {3.6875, 3.1875}}
+    end
+
+    test "getting the centroid of a lineString" do
+      linestring = %Geo.LineString{
+        coordinates: [
+          {4.86020565032959, 45.76884015325622},
+          {4.85994815826416, 45.749558161214516}
+        ]
+      }
+
+      assert Measurement.centroid(linestring) == %Geo.Point{
+               coordinates: {4.860076904296875, 45.75919915723537}
+             }
+    end
+  end
 end

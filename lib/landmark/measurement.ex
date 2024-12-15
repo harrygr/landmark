@@ -45,4 +45,35 @@ defmodule Landmark.Measurement do
     (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
     |> Landmark.Helpers.radians_to_length(unit)
   end
+
+  @doc """
+  Computes the centroid as the mean of all vertices within the object.
+  """
+  def centroid(object)
+  def centroid(%Geo.Point{} = p), do: p
+
+  def centroid(%Geo.Polygon{coordinates: coordinates}) do
+    coordinates
+    # drop the head of each set of points as they should contain
+    # a wrapping point to bring it back to the start
+    |> Stream.flat_map(fn [_ | points] -> points end)
+    |> centroid()
+  end
+
+  def centroid(%Geo.LineString{coordinates: coordinates}) do
+    centroid(coordinates)
+  end
+
+  def centroid(coordinates) do
+    coordinates
+    |> Enum.reduce(
+      %{x_sum: 0, y_sum: 0, len: 0},
+      fn {x, y}, %{x_sum: x_sum, y_sum: y_sum, len: len} ->
+        %{x_sum: x_sum + x, y_sum: y_sum + y, len: len + 1}
+      end
+    )
+    |> then(fn %{x_sum: x_sum, y_sum: y_sum, len: len} ->
+      %Geo.Point{coordinates: {x_sum / len, y_sum / len}}
+    end)
+  end
 end
