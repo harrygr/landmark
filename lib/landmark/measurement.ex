@@ -64,6 +64,10 @@ defmodule Landmark.Measurement do
     centroid(coordinates)
   end
 
+  def centroid(%Geo.MultiPoint{coordinates: coordinates}) do
+    centroid(coordinates)
+  end
+
   def centroid(coordinates) do
     coordinates
     |> Enum.reduce(

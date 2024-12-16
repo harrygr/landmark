@@ -44,6 +44,14 @@ defmodule MeasurementTest do
       assert Measurement.centroid(point) == %Geo.Point{coordinates: {2, 3}}
     end
 
+    test "getting the centroid of a multipoint" do
+      multipoint = %Geo.MultiPoint{
+        coordinates: [{2, 2}, {2, 4}, {6, 4}, {6, 2}]
+      }
+
+      assert Measurement.centroid(multipoint) == %Geo.Point{coordinates: {4, 3}}
+    end
+
     test "getting the centroid of a polygon" do
       polygon = %Geo.Polygon{
         coordinates: [[{2, 2}, {2, 4}, {6, 4}, {6, 2}, {2, 2}]]
