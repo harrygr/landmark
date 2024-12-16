@@ -60,13 +60,8 @@ defmodule Landmark.Measurement do
     |> centroid()
   end
 
-  def centroid(%Geo.LineString{coordinates: coordinates}) do
-    centroid(coordinates)
-  end
-
-  def centroid(%Geo.MultiPoint{coordinates: coordinates}) do
-    centroid(coordinates)
-  end
+  def centroid(%Geo.LineString{coordinates: coordinates}), do: centroid(coordinates)
+  def centroid(%Geo.MultiPoint{coordinates: coordinates}), do: centroid(coordinates)
 
   def centroid(coordinates) do
     coordinates
@@ -78,6 +73,29 @@ defmodule Landmark.Measurement do
     )
     |> then(fn %{x_sum: x_sum, y_sum: y_sum, len: len} ->
       %Geo.Point{coordinates: {x_sum / len, y_sum / len}}
+    end)
+  end
+
+  @doc """
+  Computes the bounding box for an object
+  """
+  def bbox(object)
+
+  def bbox(%Geo.Point{coordinates: coordinates}), do: bbox([coordinates])
+  def bbox(%Geo.LineString{coordinates: coordinates}), do: bbox(coordinates)
+  def bbox(%Geo.MultiPoint{coordinates: coordinates}), do: bbox(coordinates)
+
+  def bbox(%Geo.Polygon{coordinates: coordinates}) do
+    coordinates
+    |> List.flatten()
+    |> bbox()
+  end
+
+  def bbox(coordinates) do
+    coordinates
+    |> Enum.reduce(nil, fn
+      {x, y}, nil -> {x, y, x, y}
+      {x, y}, {x1, y1, x2, y2} -> {min(x, x1), min(y, y1), max(x, x2), max(y, y2)}
     end)
   end
 end

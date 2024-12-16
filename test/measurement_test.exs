@@ -84,4 +84,37 @@ defmodule MeasurementTest do
              }
     end
   end
+
+  describe "bbox" do
+    test "getting the bbox for a point" do
+      point = %Geo.Point{
+        coordinates: {102.0, 0.5}
+      }
+
+      assert Measurement.bbox(point) == {102, 0.5, 102, 0.5}
+    end
+
+    test "getting the bbox for a multipoint" do
+      multipoint = %Geo.MultiPoint{
+        coordinates: [
+          {102.0, -10.0},
+          {103.0, 1.0},
+          {104.0, 0.0},
+          {130.0, 4.0}
+        ]
+      }
+
+      assert Measurement.bbox(multipoint) == {102, -10, 130, 4}
+    end
+
+    test "getting the bbox for a polygon" do
+      polygon = %Geo.Polygon{
+        coordinates: [
+          [{101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}, {101.0, 0.0}]
+        ]
+      }
+
+      assert Measurement.bbox(polygon) == {100, 0, 101, 1}
+    end
+  end
 end
