@@ -77,8 +77,17 @@ defmodule Landmark.Measurement do
   end
 
   @doc """
-  Computes the bounding box for an object
+  Computes the bounding box for an object.
+
+  ## Examples
+      iex> Landmark.Measurement.bbox(%Geo.LineString{coordinates: [{1, 2}, {4, 6}]})
+      {1, 2, 4, 6}
+
+      iex> Landmark.Measurement.bbox(%Geo.LineString{coordinates: []})
+      nil
   """
+  @spec bbox(Geo.geometry() | list({number(), number()})) ::
+          {number(), number(), number(), number()} | nil
   def bbox(object)
 
   def bbox(%Geo.Point{coordinates: coordinates}), do: bbox([coordinates])
