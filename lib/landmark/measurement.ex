@@ -1,4 +1,5 @@
 defmodule Landmark.Measurement do
+  alias Landmark.Helpers
   alias Geo.Point
 
   @doc """
@@ -49,6 +50,7 @@ defmodule Landmark.Measurement do
   @doc """
   Computes the centroid as the mean of all vertices within the object.
   """
+  @spec centroid(Geo.geometry() | Enumerable.t(Landmark.lng_lat())) :: Geo.Point.t()
   def centroid(object)
   def centroid(%Geo.Point{} = p), do: p
 
@@ -106,6 +108,47 @@ defmodule Landmark.Measurement do
       {x, y}, nil -> {x, y, x, y}
       {x, y}, {x1, y1, x2, y2} -> {min(x, x1), min(y, y1), max(x, x2), max(y, y2)}
     end)
+  end
+
+  @doc """
+  Given a start point, initial bearing, and distance, will calculate the destina­tion point
+  from travelling along a (shortest distance) great circle arc.
+
+  ## Examples
+
+      iex> Landmark.Measurement.destination(%Geo.Point{coordinates: {-75, 39}}, 100, 90)
+      %Geo.Point{coordinates: {-73.84285308264721, 38.99428496242162}}
+  """
+  @spec destination(Geo.Point.t(), number(), number(), keyword()) :: Geo.Point.t()
+  def destination(origin, distance, bearing, options \\ [unit: :kilometers])
+
+  def destination(
+        %Geo.Point{coordinates: {lon, lat}},
+        distance,
+        bearing,
+        options
+      ) do
+    distance_unit = Keyword.get(options, :unit)
+
+    lon_1 = Math.deg2rad(lon)
+    lat_1 = Math.deg2rad(lat)
+    distance_radians = Helpers.length_to_radians(distance, distance_unit)
+    bearing_radians = Math.deg2rad(bearing)
+
+    lat_2 =
+      Math.asin(
+        Math.sin(lat_1) * Math.cos(distance_radians) +
+          Math.cos(lat_1) * Math.sin(distance_radians) * Math.cos(bearing_radians)
+      )
+
+    lon_2 =
+      lon_1 +
+        Math.atan2(
+          Math.sin(bearing_radians) * Math.sin(distance_radians) * Math.cos(lat_1),
+          Math.cos(distance_radians) - Math.sin(lat_1) * Math.sin(lat_2)
+        )
+
+    %Geo.Point{coordinates: {Math.rad2deg(lon_2), Math.rad2deg(lat_2)}}
   end
 
   @doc """
