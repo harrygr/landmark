@@ -86,8 +86,8 @@ defmodule Landmark.Measurement do
       iex> Landmark.Measurement.bbox(%Geo.LineString{coordinates: []})
       nil
   """
-  @spec bbox(Geo.geometry() | list({number(), number()})) ::
-          {number(), number(), number(), number()} | nil
+  @spec bbox(Geo.geometry() | Enumerable.t(Landmark.lng_lat())) ::
+          Landmark.bbox() | nil
   def bbox(object)
 
   def bbox(%Geo.Point{coordinates: coordinates}), do: bbox([coordinates])
@@ -106,5 +106,60 @@ defmodule Landmark.Measurement do
       {x, y}, nil -> {x, y, x, y}
       {x, y}, {x1, y1, x2, y2} -> {min(x, x1), min(y, y1), max(x, x2), max(y, y2)}
     end)
+  end
+
+  @doc """
+  Returns the destination point having travelled along a rhumb line from
+  the origin point the given distance on the given bearing.
+
+  See http://www.movable-type.co.uk/scripts/latlong.html#rhumblines
+  """
+  def rhumb_destination(origin, distance, bearing, options \\ [unit: :kilometers])
+
+  def rhumb_destination(%Geo.Point{coordinates: coordinates}, distance, bearing, options) do
+    %Geo.Point{coordinates: calculate_rhumb_destination(coordinates, distance, bearing, options)}
+  end
+
+  @doc """
+  Calculates the rhumb destination for longitude and latitude
+  """
+  @spec calculate_rhumb_destination(Landmark.lng_lat(), number(), number(), keyword()) ::
+          Landmark.lng_lat()
+  def calculate_rhumb_destination({lon, lat}, distance, bearing, options \\ [unit: :kilometers]) do
+    distance_unit = Keyword.get(options, :unit)
+
+    distance_in_meters = Landmark.Helpers.convert_length(distance, distance_unit, :meters)
+    earth_radius = Landmark.Helpers.earth_radius_in_meters()
+
+    delta = distance_in_meters / earth_radius
+
+    theta = Math.deg2rad(bearing)
+
+    phi_1 = Math.deg2rad(lat)
+
+    lambda_1 = Math.deg2rad(lon)
+
+    delta_phi = delta * Math.cos(theta)
+
+    phi_2 =
+      (phi_1 + delta_phi)
+      |> then(fn p2 ->
+        # check for some daft bugger going past the pole, normalise latitude if so
+        cond do
+          abs(p2) > Math.pi() / 2 -> if p2 > 0, do: Math.pi() - p2, else: -Math.pi() - p2
+          true -> p2
+        end
+      end)
+
+    delta_psi =
+      Math.log(Math.tan(phi_2 / 2 + Math.pi() / 4) / Math.tan(phi_1 / 2 + Math.pi() / 4))
+
+    q = if abs(delta_psi) > 10.0e-12, do: delta_phi / delta_psi, else: Math.cos(phi_1)
+
+    delta_lambda = delta * Math.sin(theta) / q
+
+    lambda_2 = lambda_1 + delta_lambda
+
+    {Math.rad2deg(lambda_2), Math.rad2deg(phi_2)}
   end
 end
