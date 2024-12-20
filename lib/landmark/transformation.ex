@@ -13,10 +13,11 @@ defmodule Landmark.Transformation do
   def transform(%Geo.LineString{coordinates: coordinates}, distance, bearing, options) do
     %Geo.LineString{
       coordinates:
-        Enum.map(
+        Stream.map(
           coordinates,
-          &Measurement.calculate_rhumb_destination(&1, distance, bearing, options)
+          &Measurement.rhumb_destination(%Geo.Point{coordinates: &1}, distance, bearing, options)
         )
+        |> Enum.map(&Map.get(&1, :coordinates))
     }
   end
 end

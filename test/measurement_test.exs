@@ -120,24 +120,24 @@ defmodule MeasurementTest do
 
   describe "rhumb destination calculation" do
     test "travelling 100km 90°" do
-      origin = {-75, 39}
-      destination = Landmark.Measurement.calculate_rhumb_destination(origin, 100, 90)
+      origin = %Geo.Point{coordinates: {-75, 39}}
+      destination = Landmark.Measurement.rhumb_destination(origin, 100, 90)
 
-      assert destination == {-73.84279077386554, 39.0}
+      assert destination == %Geo.Point{coordinates: {-73.84279077386554, 39.0}}
     end
 
     test "travelling 100km 180°" do
-      origin = {-75, 39}
-      destination = Landmark.Measurement.calculate_rhumb_destination(origin, 100, 180)
+      origin = %Geo.Point{coordinates: {-75, 39}}
+      destination = Landmark.Measurement.rhumb_destination(origin, 100, 180)
 
-      assert destination == {-75.0, 38.10067952334886}
+      assert destination == %Geo.Point{coordinates: {-75.0, 38.10067952334886}}
     end
 
     test "getting a destination over the meridian" do
-      origin = {-179.5, -16.5}
-      destination = Landmark.Measurement.calculate_rhumb_destination(origin, 100, -90)
+      origin = %Geo.Point{coordinates: {-179.5, -16.5}}
+      destination = Landmark.Measurement.rhumb_destination(origin, 100, -90)
 
-      assert destination == {-180.43794531333336, -16.5}
+      assert destination == %Geo.Point{coordinates: {-180.43794531333336, -16.5}}
     end
   end
 end

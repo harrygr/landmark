@@ -163,12 +163,7 @@ defmodule Landmark.Measurement do
     %Geo.Point{coordinates: calculate_rhumb_destination(coordinates, distance, bearing, options)}
   end
 
-  @doc """
-  Calculates the rhumb destination for longitude and latitude
-  """
-  @spec calculate_rhumb_destination(Landmark.lng_lat(), number(), number(), keyword()) ::
-          Landmark.lng_lat()
-  def calculate_rhumb_destination({lon, lat}, distance, bearing, options \\ [unit: :kilometers]) do
+  defp calculate_rhumb_destination({lon, lat}, distance, bearing, options) do
     distance_unit = Keyword.get(options, :unit)
 
     distance_in_meters = Landmark.Helpers.convert_length(distance, distance_unit, :meters)
