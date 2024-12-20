@@ -2,7 +2,9 @@
 
 A geospatial analysis library for Elixir.
 
-Landmark is designed to work with structs provided by the [Geo][geo] library
+Landmark is a collection of functions for manipulating and performing computations on geospatial entities.
+
+It's designed to work with structs provided by the [Geo][geo] library which makes working with GeoJSON much simpler.
 
 ## Installation
 
@@ -16,4 +18,9 @@ def deps do
 end
 ```
 
+## Usage
+
+Visit [the docs][docs] for the latest API.
+
 [geo]: https://github.com/felt/geo
+[docs]: https://hexdocs.pm/landmark/api-reference.html
