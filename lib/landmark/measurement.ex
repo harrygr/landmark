@@ -49,9 +49,20 @@ defmodule Landmark.Measurement do
 
   @doc """
   Computes the centroid as the mean of all vertices within the object.
+
+  ## Examples
+
+      iex> polygon = %Geo.Polygon{coordinates: [[{2, 2}, {2, 4}, {6, 4}, {6, 2}, {2, 2}]]}
+      ...> Landmark.Measurement.centroid(polygon)
+      %Geo.Point{coordinates: {4.0, 3.0}}
+
+      iex> point = %Geo.Point{coordinates: {1, 1}}
+      ...> Landmark.Measurement.centroid(point)
+      %Geo.Point{coordinates: {1, 1}}
   """
   @spec centroid(Geo.geometry() | Enumerable.t(Landmark.lng_lat())) :: Geo.Point.t()
-  def centroid(object)
+  def centroid(geometry)
+
   def centroid(%Geo.Point{} = p), do: p
 
   def centroid(%Geo.Polygon{coordinates: coordinates}) do
@@ -75,6 +86,60 @@ defmodule Landmark.Measurement do
     )
     |> then(fn %{x_sum: x_sum, y_sum: y_sum, len: len} ->
       %Geo.Point{coordinates: {x_sum / len, y_sum / len}}
+    end)
+  end
+
+  @doc """
+  Computes an object's center of mass using "Centroid of Polygon" formula
+
+  https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
+
+  ## Examples
+
+      iex> polygon = %Geo.Polygon{coordinates: [[{2, 2}, {2, 4}, {6, 4}, {6, 2}, {2, 2}]]}
+      ...> Landmark.Measurement.center_of_mass(polygon)
+      %Geo.Point{coordinates: {4.0, 3.0}}
+  """
+  def center_of_mass(geometry)
+
+  def center_of_mass(geometry) do
+    coordinates = Helpers.coords(geometry)
+
+    centre = centroid(coordinates)
+
+    %Geo.Point{coordinates: {tx, ty}} = centre
+
+    coordinates
+    |> Enum.map(fn {x, y} -> {x - tx, y - ty} end)
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.reduce(
+      %{s_area: 0, sx: 0, sy: 0},
+      fn [{xi, yi}, {xj, yj}], %{s_area: s_area, sx: sx, sy: sy} ->
+        # a is the common factor to compute the signed area and the final coordinates
+        a = xi * yj - xj * yi
+
+        %{
+          s_area: s_area + a,
+          sx: sx + (xi + xj) * a,
+          sy: sy + (yi + yj) * a
+        }
+      end
+    )
+    |> then(fn
+      %{s_area: a} when a == 0 ->
+        centre
+
+      %{s_area: s_area, sx: sx, sy: sy} ->
+        area = s_area * 0.5
+
+        area_factor = 1 / (6 * area)
+
+        %Geo.Point{
+          coordinates: {
+            tx + area_factor * sx,
+            ty + area_factor * sy
+          }
+        }
     end)
   end
 

@@ -85,6 +85,79 @@ defmodule MeasurementTest do
     end
   end
 
+  describe "center of mass" do
+    test "getting the center_of_mass of a point" do
+      point = %Geo.Point{
+        coordinates: {2, 3}
+      }
+
+      assert Measurement.center_of_mass(point) == %Geo.Point{coordinates: {2, 3}}
+    end
+
+    test "getting the center of mass of a multipoint" do
+      multipoint = %Geo.MultiPoint{
+        coordinates: [{1, 2}, {5, 6}]
+      }
+
+      assert Measurement.center_of_mass(multipoint) == %Geo.Point{coordinates: {3, 4}}
+    end
+
+    test "getting the center of mass of a multipoint with a single point" do
+      multipoint = %Geo.MultiPoint{
+        coordinates: [{1, 2}]
+      }
+
+      assert Measurement.center_of_mass(multipoint) == %Geo.Point{coordinates: {1, 2}}
+    end
+
+    test "getting the center of mass of a polygon" do
+      polygon = %Geo.Polygon{
+        coordinates: [
+          [
+            {4.8250579833984375, 45.79398056386735},
+            {4.882392883300781, 45.79254427435898},
+            {4.910373687744141, 45.76081677972451},
+            {4.894924163818359, 45.7271539426975},
+            {4.824199676513671, 45.71337148333104},
+            {4.773387908935547, 45.74021417890731},
+            {4.778022766113281, 45.778418789239055},
+            {4.8250579833984375, 45.79398056386735}
+          ]
+        ]
+      }
+
+      assert Measurement.center_of_mass(polygon) == %Geo.Point{
+               coordinates: {4.840728965137111, 45.75581209996416}
+             }
+    end
+
+    test "getting the center of mass of a polygon with a hole" do
+      polygon = %Geo.Polygon{
+        coordinates: [
+          [{2, 2}, {2, 4}, {6, 4}, {6, 2}, {2, 2}],
+          [{3, 3}, {3, 3.5}, {3.5, 4}, {4, 3}, {3, 3}]
+        ]
+      }
+
+      assert Measurement.center_of_mass(polygon) == %Geo.Point{
+               coordinates: {3.933050047214353, 3.018791312559018}
+             }
+    end
+
+    test "getting the centroid of a lineString" do
+      linestring = %Geo.LineString{
+        coordinates: [
+          {4.86020565032959, 45.76884015325622},
+          {4.85994815826416, 45.749558161214516}
+        ]
+      }
+
+      assert Measurement.centroid(linestring) == %Geo.Point{
+               coordinates: {4.860076904296875, 45.75919915723537}
+             }
+    end
+  end
+
   describe "bbox" do
     test "getting the bbox for a point" do
       point = %Geo.Point{
