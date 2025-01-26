@@ -61,4 +61,22 @@ defmodule Landmark.Helpers do
     |> length_to_radians(from)
     |> radians_to_length(to)
   end
+
+  @doc """
+  Get the coordinates from a GeoJSON object.
+
+  ## Examples
+      iex> Landmark.Helpers.coords(%Geo.Point{coordinates: {1, 2}})
+      [{1, 2}]
+      iex> Landmark.Helpers.coords(%Geo.MultiPoint{coordinates: [{1, 2}, {3, 4}]})
+      [{1, 2}, {3, 4}]
+      iex> Landmark.Helpers.coords(%Geo.Polygon{coordinates: [[{1, 2}, {3, 4}, {5, 6}], [{7, 8}, {9, 10}]]})
+      [{1, 2}, {3, 4}, {5, 6}, {7, 8}, {9, 10}]
+  """
+  def coords(geojson)
+  def coords(%Geo.Point{coordinates: coordinates}), do: [coordinates]
+  def coords(%Geo.MultiPoint{coordinates: coordinates}), do: coordinates
+  def coords(%Geo.LineString{coordinates: coordinates}), do: coordinates
+  def coords(%Geo.MultiLineString{coordinates: coordinates}), do: List.flatten(coordinates)
+  def coords(%Geo.Polygon{coordinates: coordinates}), do: List.flatten(coordinates)
 end
