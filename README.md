@@ -13,7 +13,7 @@ Add `landmark` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:landmark, "~> 0.3.0"}
+    {:landmark, "~> 0.5.0"}
   ]
 end
 ```

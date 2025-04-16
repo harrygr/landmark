@@ -4,7 +4,7 @@ defmodule Landmark.MixProject do
   def project do
     [
       app: :landmark,
-      version: "0.4.0",
+      version: "0.5.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
