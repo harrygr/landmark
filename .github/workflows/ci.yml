@@ -62,6 +62,7 @@ jobs:
           elixir-version: 1.17.x
 
       - name: Check for version bump
+        id: check_version
         run: |
           # Extract version from mix.exs before and after the change
           OLD_VERSION=$(git show HEAD~1:mix.exs | grep version | sed -E 's/.*version: "([^"]+)".*/\1/')
