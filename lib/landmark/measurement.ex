@@ -265,4 +265,37 @@ defmodule Landmark.Measurement do
 
     {Math.rad2deg(lambda_2), Math.rad2deg(phi_2)}
   end
+
+  @doc """
+  Calculates the total length of a geometry feature.
+
+  For point geometries, returns the sum of distances between consecutive points.
+  For other geometries, extracts coordinates and calculates the total distance.
+
+  ## Examples
+
+      iex> line = %Geo.LineString{coordinates: [{0, 0}, {1, 1}, {2, 0}]}
+      ...> Landmark.Measurement.length(line, :meters)
+      314499.1574567902
+
+      iex> coords = [{0, 0}, {1, 1}]
+      ...> Landmark.Measurement.length(coords, :kilometers)
+      157.2495787283951
+  """
+  def length(feature, unit \\ :kilometers)
+
+  def length(coords, unit) when is_list(coords) do
+    coords
+    |> Stream.chunk_every(2, 1, :discard)
+    |> Stream.map(fn [from, to] ->
+      distance(%Geo.Point{coordinates: from}, %Geo.Point{coordinates: to}, unit)
+    end)
+    |> Enum.sum()
+  end
+
+  def length(feature, unit), do: length(extract_coordinates(feature), unit)
+
+  defp extract_coordinates(%Geo.Point{coordinates: coordinates}), do: [coordinates]
+  defp extract_coordinates(%Geo.LineString{coordinates: coordinates}), do: coordinates
+  defp extract_coordinates(%Geo.MultiPoint{coordinates: coordinates}), do: coordinates
 end

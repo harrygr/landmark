@@ -1,5 +1,6 @@
 defmodule Landmark.Helpers do
   @earth_radius_in_meters 6_371_008.0
+  @meters_per_foot 0.3048
 
   @type length_unit() :: :radians | :meters | :metres | :kilometers | :kilometres
 
@@ -21,6 +22,7 @@ defmodule Landmark.Helpers do
   def radians_to_length(radians, :metres), do: radians_to_length(radians, :meters)
   def radians_to_length(radians, :kilometers), do: radians * @earth_radius_in_meters / 1_000
   def radians_to_length(radians, :kilometres), do: radians_to_length(radians, :kilometers)
+  def radians_to_length(radians, :feet), do: radians * @earth_radius_in_meters / @meters_per_foot
 
   @doc """
   Convert a `length` measurement in the given `unit` to radians (assuming a spherical earth).
@@ -37,6 +39,7 @@ defmodule Landmark.Helpers do
   def length_to_radians(length, :metres), do: radians_to_length(length, :meters)
   def length_to_radians(length, :kilometers), do: length * 1000 / @earth_radius_in_meters
   def length_to_radians(length, :kilometres), do: radians_to_length(length, :kilometers)
+  def length_to_radians(length, :feet), do: length * @meters_per_foot / @earth_radius_in_meters
 
   @doc """
   Convert a `length` from `from` unit to `to`
